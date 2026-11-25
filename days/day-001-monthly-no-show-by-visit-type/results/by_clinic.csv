@@ -1,0 +1,7 @@
+clinic_id,clinic_name,geography,eligible_visits,no_shows,no_show_rate_pct
+C05,Brookfield Medical Group,Urban,7504,1930,25.7
+C04,Lakeside Family Practice,Suburban,7771,1269,16.3
+C03,Cedar Hollow Clinic,Rural,7229,1172,16.2
+C06,Pine Ridge Clinic,Rural,6973,1108,15.9
+C01,Maple Street Primary Care,Urban,8021,1265,15.8
+C02,Oakridge Family Medicine,Suburban,7592,1154,15.2

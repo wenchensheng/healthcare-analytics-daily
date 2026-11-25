@@ -1,0 +1,5 @@
+visit_type,eligible_visits,no_shows,no_show_rate_pct,avg_lead_days,pct_lead_over_14_days
+new_patient,4521,1088,24.1,16.2,54.0
+preventive,8923,1853,20.8,12.4,36.3
+chronic_followup,20458,3558,17.4,11.9,34.2
+acute,11188,1399,12.5,3.9,6.9
