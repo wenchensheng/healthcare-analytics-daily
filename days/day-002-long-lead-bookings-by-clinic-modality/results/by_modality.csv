@@ -1,0 +1,4 @@
+modality,scheduled_visits,booked_over_14_days,pct_over_14_days,avg_lead_days
+in_person,36005,14488,40.2,12.5
+video,9289,329,3.5,5.4
+audio,4244,92,2.2,5.0

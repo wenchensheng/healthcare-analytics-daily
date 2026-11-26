@@ -1,0 +1,9 @@
+visit_type,clinic_group,scheduled_visits,pct_over_14_days,avg_lead_days
+acute,C05 Brookfield,1672,49.8,14.5
+acute,Peer clinics,8349,0.0,2.0
+chronic_followup,C05 Brookfield,2470,96.9,25.5
+chronic_followup,Peer clinics,12294,40.7,13.0
+new_patient,C05 Brookfield,652,99.2,29.4
+new_patient,Peer clinics,3371,60.8,16.9
+preventive,C05 Brookfield,1207,97.7,25.7
+preventive,Peer clinics,5990,39.8,12.9

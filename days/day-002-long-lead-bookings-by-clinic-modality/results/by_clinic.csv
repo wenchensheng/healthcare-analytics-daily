@@ -1,0 +1,7 @@
+clinic_id,clinic_name,scheduled_visits,booked_over_14_days,pct_over_14_days,avg_lead_days
+C05,Brookfield Medical Group,8352,5472,65.5,19.6
+C01,Maple Street Primary Care,8775,2054,23.4,8.7
+C04,Lakeside Family Practice,8537,1970,23.1,8.7
+C03,Cedar Hollow Clinic,7941,1829,23.0,8.7
+C02,Oakridge Family Medicine,8309,1905,22.9,8.7
+C06,Pine Ridge Clinic,7624,1679,22.0,8.5

@@ -1,0 +1,19 @@
+clinic_id,clinic_name,modality,scheduled_visits,booked_over_14_days,pct_over_14_days,avg_lead_days
+C01,Maple Street Primary Care,audio,600,0,0.0,4.2
+C01,Maple Street Primary Care,in_person,6354,2054,32.3,10.5
+C01,Maple Street Primary Care,video,1821,0,0.0,4.0
+C02,Oakridge Family Medicine,audio,579,0,0.0,4.0
+C02,Oakridge Family Medicine,in_person,6066,1905,31.4,10.3
+C02,Oakridge Family Medicine,video,1664,0,0.0,4.1
+C03,Cedar Hollow Clinic,audio,919,0,0.0,4.0
+C03,Cedar Hollow Clinic,in_person,5779,1829,31.6,10.4
+C03,Cedar Hollow Clinic,video,1243,0,0.0,4.0
+C04,Lakeside Family Practice,audio,633,0,0.0,4.1
+C04,Lakeside Family Practice,in_person,6245,1970,31.5,10.4
+C04,Lakeside Family Practice,video,1659,0,0.0,4.1
+C05,Brookfield Medical Group,audio,603,92,15.3,10.9
+C05,Brookfield Medical Group,in_person,6001,5051,84.2,22.9
+C05,Brookfield Medical Group,video,1748,329,18.8,11.2
+C06,Pine Ridge Clinic,audio,910,0,0.0,4.1
+C06,Pine Ridge Clinic,in_person,5560,1679,30.2,10.2
+C06,Pine Ridge Clinic,video,1154,0,0.0,4.1

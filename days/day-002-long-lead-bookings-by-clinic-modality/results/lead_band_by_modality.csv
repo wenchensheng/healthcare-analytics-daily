@@ -1,0 +1,14 @@
+modality,lead_band,scheduled_visits,pct_of_modality
+audio,1: 0-3 days,1631,38.4
+audio,2: 4-7 days,1719,40.5
+audio,3: 8-14 days,802,18.9
+audio,4: 15-28 days,92,2.2
+in_person,1: 0-3 days,6752,18.8
+in_person,2: 4-7 days,4976,13.8
+in_person,3: 8-14 days,9789,27.2
+in_person,4: 15-28 days,12920,35.9
+in_person,5: 29+ days,1568,4.4
+video,1: 0-3 days,3356,36.1
+video,2: 4-7 days,3711,40.0
+video,3: 8-14 days,1893,20.4
+video,4: 15-28 days,329,3.5

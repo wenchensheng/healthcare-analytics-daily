@@ -141,4 +141,136 @@ def test_backlog_has_thirty_topics(repo_root: Path) -> None:
     items = [line for line in text.splitlines() if line.startswith("- [")]
     assert len(items) == 30, f"BACKLOG.md should list 30 days, found {len(items)}"
     assert items[0].startswith("- [x]"), "Day 001 should be checked off"
-    assert sum(1 for line in items if line.startswith("- [ ]")) == 29
+    assert items[1].startswith("- [x]"), "Day 002 should be checked off"
+    assert sum(1 for line in items if line.startswith("- [ ]")) == 28
+
+
+def test_every_day_is_indexed_in_root_readme(repo_root: Path, day_dirs: list[Path]) -> None:
+    readme = (repo_root / "README.md").read_text(encoding="utf-8")
+    missing = [d.name for d in day_dirs if f"(days/{d.name}/)" not in readme]
+    assert not missing, f"Day folders missing from the root README index: {missing}"
+
+
+DAY002 = "day-002-long-lead-bookings-by-clinic-modality"
+
+
+def test_day002_query_numbers(repo_root: Path, db_path: Path) -> None:
+    day = repo_root / "days" / DAY002
+    r = _result_map(day / "query.sql", db_path)
+
+    overall = r["overall"].iloc[0]
+    assert int(overall["scheduled_visits"]) == 49538
+    assert int(overall["booked_over_14_days"]) == 14909
+    assert float(overall["pct_over_14_days"]) == 30.1
+    assert float(overall["avg_lead_days"]) == 10.5
+
+    check = r["lead_days_check"].iloc[0]
+    assert int(check["mismatched_rows"]) == 0
+    assert int(check["booked_after_visit"]) == 0
+    assert int(check["max_lead_days"]) == 47
+
+    by_mod = r["by_modality"].set_index("modality")
+    assert float(by_mod.loc["in_person", "pct_over_14_days"]) == 40.2
+    assert float(by_mod.loc["video", "pct_over_14_days"]) == 3.5
+    assert float(by_mod.loc["audio", "pct_over_14_days"]) == 2.2
+    assert int(by_mod["scheduled_visits"].sum()) == 49538
+
+    pct = r["lead_percentiles_by_modality"].set_index("modality")
+    assert int(pct.loc["in_person", "median_lead_days"]) == 12
+    assert int(pct.loc["in_person", "p90_lead_days"]) == 23
+
+    by_clinic = r["by_clinic"].set_index("clinic_id")["pct_over_14_days"].astype(float)
+    assert by_clinic.loc["C05"] == 65.5
+    assert by_clinic.idxmax() == "C05"
+    assert len(by_clinic) == 6
+
+    cm = r["clinic_by_modality"]
+    assert len(cm) == 18
+    peers_virtual = cm[(cm["clinic_id"] != "C05") & (cm["modality"] != "in_person")]
+    assert int(peers_virtual["booked_over_14_days"].sum()) == 0
+    c05 = cm[cm["clinic_id"] == "C05"].set_index("modality")["pct_over_14_days"].astype(float)
+    assert c05.loc["in_person"] == 84.2
+    assert c05.loc["video"] == 18.8
+    assert c05.loc["audio"] == 15.3
+
+    groups = r["in_person_c05_vs_peers"].set_index("clinic_group")
+    assert float(groups.loc["C05 Brookfield", "pct_over_14_days"]) == 84.2
+    assert float(groups.loc["Peer clinics", "pct_over_14_days"]) == 31.5
+    assert float(groups.loc["C05 Brookfield", "avg_lead_days"]) == 22.9
+    assert float(groups.loc["Peer clinics", "avg_lead_days"]) == 10.4
+
+    vt = r["in_person_c05_vs_peers_by_visit_type"].set_index(["visit_type", "clinic_group"])
+    assert float(vt.loc[("acute", "C05 Brookfield"), "pct_over_14_days"]) == 49.8
+    assert float(vt.loc[("acute", "Peer clinics"), "pct_over_14_days"]) == 0.0
+
+    ns = r["in_person_no_show_by_booking_window"].set_index("booking_window")["no_show_rate_pct"].astype(float)
+    assert ns.loc["over_14_days"] == 25.8
+    assert ns.loc["14_days_or_less"] == 16.5
+
+    bands = r["lead_band_by_modality"]
+    for mod, share in bands.groupby("modality")["pct_of_modality"].sum().items():
+        assert abs(float(share) - 100.0) < 0.3, f"{mod} lead bands should sum to ~100%"
+
+
+def test_day002_readme_matches_sql(repo_root: Path, db_path: Path) -> None:
+    """Every figure in the README is pulled from the query results, not typed by hand."""
+    day = repo_root / "days" / DAY002
+    readme = (day / "README.md").read_text(encoding="utf-8")
+    r = _result_map(day / "query.sql", db_path)
+
+    def pct(v) -> str:
+        return f"{float(v):.1f}%"
+
+    overall = r["overall"].iloc[0]
+    required = [
+        f"{int(overall['scheduled_visits']):,}",
+        f"{int(overall['booked_over_14_days']):,}",
+        pct(overall["pct_over_14_days"]),
+        f"{float(overall['avg_lead_days']):.1f} days",
+    ]
+    pcts = r["lead_percentiles_by_modality"].set_index("modality")
+    for _, row in r["by_modality"].iterrows():
+        required += [
+            f"{int(row['scheduled_visits']):,}",
+            f"{int(row['booked_over_14_days']):,}",
+            pct(row["pct_over_14_days"]),
+            f"{float(row['avg_lead_days']):.1f} days",
+            f"{int(pcts.loc[row['modality'], 'median_lead_days'])} days",
+            f"{int(pcts.loc[row['modality'], 'p90_lead_days'])} days",
+        ]
+    for _, row in r["by_clinic"].iterrows():
+        required += [f"{int(row['scheduled_visits']):,}", pct(row["pct_over_14_days"])]
+    required += [pct(v) for v in r["clinic_by_modality"]["pct_over_14_days"]]
+    for _, row in r["in_person_c05_vs_peers"].iterrows():
+        required += [pct(row["pct_over_14_days"]), f"{float(row['avg_lead_days']):.1f} days"]
+    yr = r["by_year_modality"].query("modality == 'in_person'")
+    required += [pct(v) for v in yr["pct_over_14_days"]]
+    vt = r["in_person_c05_vs_peers_by_visit_type"].query("visit_type == 'acute'")
+    required += [pct(v) for v in vt["pct_over_14_days"]]
+    required += [pct(v) for v in r["in_person_no_show_by_booking_window"]["no_show_rate_pct"]]
+
+    missing = sorted({item for item in required if item not in readme})
+    assert not missing, f"Day 002 README is missing numbers: {missing}"
+
+
+def test_day002_chart_exists(repo_root: Path) -> None:
+    chart = repo_root / "days" / DAY002 / "chart.png"
+    if not chart.exists():
+        pytest.skip("chart.png not built yet; run python run_all.py first")
+    assert chart.stat().st_size > 10_000, "chart.png looks too small to be a real figure"
+
+
+def test_day002_notebook_has_outputs(repo_root: Path) -> None:
+    import nbformat
+
+    path = repo_root / "days" / DAY002 / "analysis.ipynb"
+    if not path.exists():
+        pytest.fail("Day 002 notebook is missing")
+    nb = nbformat.read(path, as_version=4)
+    code_cells = [c for c in nb.cells if c.cell_type == "code"]
+    executed = [c for c in code_cells if c.get("outputs")]
+    if not executed:
+        pytest.skip("notebook has not been executed yet; run python run_all.py first")
+    assert len(executed) >= 3, "Expected executed outputs in the Day 002 notebook"
+    errors = [o for c in code_cells for o in c.get("outputs", []) if o.get("output_type") == "error"]
+    assert not errors, "Day 002 notebook has error outputs"
