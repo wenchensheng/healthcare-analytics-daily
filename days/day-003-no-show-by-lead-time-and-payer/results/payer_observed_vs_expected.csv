@@ -1,0 +1,6 @@
+payer_id,payer_name,eligible_visits,observed_no_shows,expected_no_shows,observed_rate_pct,expected_rate_pct,observed_to_expected
+MCAID,Medicaid,7639,1579,1340.5,20.7,17.5,1.18
+SELF,Self-pay,2226,439,387.1,19.7,17.4,1.13
+BRCH,Birch HMO,7382,1371,1300.5,18.6,17.6,1.05
+SUMP,Summit PPO,14695,2530,2574.0,17.2,17.5,0.98
+MEDCR,Medicare FFS,13148,1979,2296.0,15.1,17.5,0.86

@@ -1,0 +1,6 @@
+lead_band,lowest_payer,lowest_rate_pct,highest_payer,highest_rate_pct,spread_pp
+1: 0-3 days,Medicare FFS,8.5,Self-pay,13.5,5.0
+2: 4-7 days,Medicare FFS,10.3,Self-pay,16.8,6.5
+3: 8-14 days,Medicare FFS,15.4,Medicaid,21.5,6.1
+4: 15-28 days,Medicare FFS,22.4,Medicaid,28.4,6.1
+5: 29+ days,Summit PPO,33.3,Self-pay,38.9,5.6

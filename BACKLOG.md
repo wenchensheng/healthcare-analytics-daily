@@ -1,12 +1,12 @@
 # Backlog
 
-Thirty concrete day topics. Days 001–002 are done. Each remaining line is one small, complete exercise that should take well under a day and still produce a real finding. Data sources point at tables in [`shared/clinic.db`](shared/clinic.db) unless a public CMS file is named.
+Thirty concrete day topics. Days 001–003 are done. Each remaining line is one small, complete exercise that should take well under a day and still produce a real finding. Data sources point at tables in [`shared/clinic.db`](shared/clinic.db) unless a public CMS file is named.
 
 Check a line off when the day folder is added and the root README index is updated.
 
 - [x] **Day 001.** Monthly clinic no-show rate and trend by visit type. Data: synthetic `fact_appointment`.
 - [x] **Day 002.** Access: share of visits booked more than 14 days out, by clinic and modality. Data: synthetic `fact_appointment`.
-- [ ] **Day 003.** No-show rate by lead-time band and payer. Data: synthetic `fact_appointment`, `dim_payer`.
+- [x] **Day 003.** No-show rate by lead-time band and payer. Data: synthetic `fact_appointment`, `dim_payer`.
 - [ ] **Day 004.** Clinic outlier: which site's no-show rate stays above the network, month after month (z-score / window functions). Data: synthetic `fact_appointment`.
 - [ ] **Day 005.** Data-quality audit of an appointment extract: duplicates, null clinics, reversed dates, mixed labels. Data: synthetic `raw_appointment_extract`.
 - [ ] **Day 006.** Claim denial rate by payer and denial reason. Data: synthetic `fact_claim`, `dim_payer`.

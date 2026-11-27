@@ -1,0 +1,26 @@
+payer_id,payer_name,lead_band,eligible_visits,no_shows,no_show_rate_pct
+BRCH,Birch HMO,1: 0-3 days,1746,194,11.1
+BRCH,Birch HMO,2: 4-7 days,1540,212,13.8
+BRCH,Birch HMO,3: 8-14 days,1826,358,19.6
+BRCH,Birch HMO,4: 15-28 days,2032,523,25.7
+BRCH,Birch HMO,5: 29+ days,238,84,35.3
+MCAID,Medicaid,1: 0-3 days,1772,230,13.0
+MCAID,Medicaid,2: 4-7 days,1678,270,16.1
+MCAID,Medicaid,3: 8-14 days,1890,407,21.5
+MCAID,Medicaid,4: 15-28 days,2046,582,28.4
+MCAID,Medicaid,5: 29+ days,253,90,35.6
+MEDCR,Medicare FFS,1: 0-3 days,3160,268,8.5
+MEDCR,Medicare FFS,2: 4-7 days,2756,285,10.3
+MEDCR,Medicare FFS,3: 8-14 days,3379,521,15.4
+MEDCR,Medicare FFS,4: 15-28 days,3490,781,22.4
+MEDCR,Medicare FFS,5: 29+ days,363,124,34.2
+SELF,Self-pay,1: 0-3 days,550,74,13.5
+SELF,Self-pay,2: 4-7 days,469,79,16.8
+SELF,Self-pay,3: 8-14 days,567,108,19.0
+SELF,Self-pay,4: 15-28 days,568,150,26.4
+SELF,Self-pay,5: 29+ days,72,28,38.9
+SUMP,Summit PPO,1: 0-3 days,3498,366,10.5
+SUMP,Summit PPO,2: 4-7 days,3045,385,12.6
+SUMP,Summit PPO,3: 8-14 days,3752,701,18.7
+SUMP,Summit PPO,4: 15-28 days,3946,927,23.5
+SUMP,Summit PPO,5: 29+ days,454,151,33.3

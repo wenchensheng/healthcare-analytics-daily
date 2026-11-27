@@ -4,7 +4,7 @@ A series of small, complete healthcare analytics exercises — one per day — w
 
 Chensheng Wen is an Epic-certified (Cogito, Clarity, Caboodle) BI Specialist targeting healthcare data analyst, BI analyst, and Epic analyst roles, working in SQL, Python, Jupyter, and Tableau.
 
-The latest entry is **[Day 002: Share of visits booked more than 14 days out, by clinic and modality](days/day-002-long-lead-bookings-by-clinic-modality/)**.
+The latest entry is **[Day 003: No-show rate by lead-time band and payer](days/day-003-no-show-by-lead-time-and-payer/)**.
 
 ## Days
 
@@ -12,6 +12,7 @@ The latest entry is **[Day 002: Share of visits booked more than 14 days out, by
 |---:|---|---|---|---|
 | 001 | 2026-11-25 | Monthly clinic no-show rate by visit type | SQL window functions, Python, Matplotlib | [day-001-monthly-no-show-by-visit-type](days/day-001-monthly-no-show-by-visit-type/) |
 | 002 | 2026-11-26 | Share of visits booked more than 14 days out, by clinic and modality | SQL CASE and joins, ROW_NUMBER percentiles, Python, Matplotlib | [day-002-long-lead-bookings-by-clinic-modality](days/day-002-long-lead-bookings-by-clinic-modality/) |
+| 003 | 2026-11-27 | No-show rate by lead-time band and payer | SQL CASE bands and joins, ROW_NUMBER, indirect standardization, Python, Matplotlib | [day-003-no-show-by-lead-time-and-payer](days/day-003-no-show-by-lead-time-and-payer/) |
 
 Planned topics for later days are in [BACKLOG.md](BACKLOG.md). How to add the next day is in [HOW_TO_ADD_A_DAY.md](HOW_TO_ADD_A_DAY.md).
 
@@ -65,7 +66,8 @@ healthcare-analytics-daily/
 ├── days/
 │   ├── _template/                  # copied by scripts/new_day.py
 │   ├── day-001-monthly-no-show-by-visit-type/
-│   └── day-002-long-lead-bookings-by-clinic-modality/
+│   ├── day-002-long-lead-bookings-by-clinic-modality/
+│   └── day-003-no-show-by-lead-time-and-payer/
 ├── scripts/new_day.py
 └── tests/
 ```

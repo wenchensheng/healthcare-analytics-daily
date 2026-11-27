@@ -142,7 +142,9 @@ def test_backlog_has_thirty_topics(repo_root: Path) -> None:
     assert len(items) == 30, f"BACKLOG.md should list 30 days, found {len(items)}"
     assert items[0].startswith("- [x]"), "Day 001 should be checked off"
     assert items[1].startswith("- [x]"), "Day 002 should be checked off"
-    assert sum(1 for line in items if line.startswith("- [ ]")) == 28
+    assert items[2].startswith("- [x]"), "Day 003 should be checked off"
+    assert sum(1 for line in items if line.startswith("- [ ]")) == 27
+    assert "Days 001–003 are done" in text
 
 
 def test_every_day_is_indexed_in_root_readme(repo_root: Path, day_dirs: list[Path]) -> None:
@@ -274,3 +276,163 @@ def test_day002_notebook_has_outputs(repo_root: Path) -> None:
     assert len(executed) >= 3, "Expected executed outputs in the Day 002 notebook"
     errors = [o for c in code_cells for o in c.get("outputs", []) if o.get("output_type") == "error"]
     assert not errors, "Day 002 notebook has error outputs"
+
+
+DAY003 = "day-003-no-show-by-lead-time-and-payer"
+
+
+def test_day003_query_numbers(repo_root: Path, db_path: Path) -> None:
+    day = repo_root / "days" / DAY003
+    r = _result_map(day / "query.sql", db_path)
+
+    check = r["payer_join_check"].iloc[0]
+    assert int(check["scheduled_visits"]) == 49538
+    assert int(check["no_patient_match"]) == 0
+    assert int(check["no_payer_match"]) == 0
+    assert int(check["duplicate_patients"]) == 0
+
+    overall = r["overall"].iloc[0]
+    assert int(overall["eligible_visits"]) == 45090
+    assert int(overall["no_shows"]) == 7898
+    assert float(overall["no_show_rate_pct"]) == 17.5
+
+    band = r["by_lead_band"].set_index("lead_band")
+    assert len(band) == 5
+    assert int(band["eligible_visits"].sum()) == 45090
+    assert int(band["no_shows"].sum()) == 7898
+    assert abs(float(band["pct_of_eligible"].sum()) - 100.0) < 0.3
+    rates = band["no_show_rate_pct"].astype(float)
+    assert rates.loc["1: 0-3 days"] == 10.6
+    assert rates.loc["2: 4-7 days"] == 13.0
+    assert rates.loc["3: 8-14 days"] == 18.4
+    assert rates.loc["4: 15-28 days"] == 24.5
+    assert rates.loc["5: 29+ days"] == 34.6
+    assert rates.is_monotonic_increasing, "no-show rate should rise with lead time"
+
+    ip = r["in_person_by_lead_band"].set_index("lead_band")["no_show_rate_pct"].astype(float)
+    assert ip.loc["1: 0-3 days"] == 12.5
+    assert ip.loc["5: 29+ days"] == 34.6
+    assert ip.is_monotonic_increasing
+
+    payer = r["by_payer"].set_index("payer_name")
+    assert len(payer) == 5
+    assert int(payer["eligible_visits"].sum()) == 45090
+    assert float(payer.loc["Medicaid", "no_show_rate_pct"]) == 20.7
+    assert float(payer.loc["Self-pay", "no_show_rate_pct"]) == 19.7
+    assert float(payer.loc["Birch HMO", "no_show_rate_pct"]) == 18.6
+    assert float(payer.loc["Summit PPO", "no_show_rate_pct"]) == 17.2
+    assert float(payer.loc["Medicare FFS", "no_show_rate_pct"]) == 15.1
+    # Lead-time mix is nearly identical across payers.
+    assert float(payer["pct_over_14_days"].max() - payer["pct_over_14_days"].min()) < 2.5
+
+    pb = r["payer_by_lead_band"]
+    assert len(pb) == 25
+    assert int(pb["eligible_visits"].sum()) == 45090
+    cell = pb.set_index(["payer_name", "lead_band"])
+    assert float(cell.loc[("Medicaid", "4: 15-28 days"), "no_show_rate_pct"]) == 28.4
+    for name, grp in pb.groupby("payer_name"):
+        assert grp.sort_values("lead_band")["no_show_rate_pct"].is_monotonic_increasing, name
+
+    spread = r["payer_spread_by_lead_band"].set_index("lead_band")["spread_pp"].astype(float)
+    assert spread.min() == 5.0
+    assert spread.max() == 6.5
+
+    oe = r["payer_observed_vs_expected"].set_index("payer_name")
+    assert float(oe.loc["Medicaid", "observed_to_expected"]) == 1.18
+    assert float(oe.loc["Medicare FFS", "observed_to_expected"]) == 0.86
+    assert int(oe["observed_no_shows"].sum()) == 7898
+    assert abs(float(oe["expected_no_shows"].sum()) - 7898) < 1.0
+
+
+def test_day003_readme_matches_sql(repo_root: Path, db_path: Path) -> None:
+    """Every figure in the README is pulled from the query results, not typed by hand."""
+    day = repo_root / "days" / DAY003
+    readme = (day / "README.md").read_text(encoding="utf-8")
+    r = _result_map(day / "query.sql", db_path)
+
+    def pct(v) -> str:
+        return f"{float(v):.1f}%"
+
+    check = r["payer_join_check"].iloc[0]
+    overall = r["overall"].iloc[0]
+    required = [
+        f"{int(check['scheduled_visits']):,}",
+        f"{int(overall['eligible_visits']):,}",
+        f"{int(overall['no_shows']):,}",
+        pct(overall["no_show_rate_pct"]),
+    ]
+    for _, row in r["by_lead_band"].iterrows():
+        required += [
+            f"{int(row['eligible_visits']):,}",
+            f"{int(row['no_shows']):,}",
+            pct(row["no_show_rate_pct"]),
+            pct(row["pct_of_eligible"]),
+        ]
+    required += [pct(v) for v in r["in_person_by_lead_band"]["no_show_rate_pct"]]
+    payer = r["by_payer"]
+    for _, row in payer.iterrows():
+        required += [
+            row["payer_name"],
+            f"{int(row['eligible_visits']):,}",
+            f"{int(row['no_shows']):,}",
+            pct(row["no_show_rate_pct"]),
+            f"{float(row['avg_lead_days']):.1f} days",
+            pct(row["pct_over_14_days"]),
+        ]
+    for _, row in r["payer_observed_vs_expected"].iterrows():
+        required += [
+            f"{float(row['observed_to_expected']):.2f}",
+            f"{int(row['observed_no_shows']):,}",
+        ]
+    oe = r["payer_observed_vs_expected"].set_index("payer_name")
+    required += [
+        f"{float(oe.loc['Medicaid', 'expected_no_shows']):,.1f}",
+        f"{float(oe.loc['Medicare FFS', 'expected_no_shows']):,.1f}",
+    ]
+    for _, row in r["payer_spread_by_lead_band"].iterrows():
+        required += [
+            pct(row["lowest_rate_pct"]),
+            pct(row["highest_rate_pct"]),
+            f"{float(row['spread_pp']):.1f} pts",
+        ]
+    pb = r["payer_by_lead_band"].set_index(["payer_name", "lead_band"])
+    required += [
+        pct(pb.loc[("Medicaid", "4: 15-28 days"), "no_show_rate_pct"]),
+        pct(pb.loc[("Self-pay", "4: 15-28 days"), "no_show_rate_pct"]),
+        f"{int(pb.loc[('Medicaid', '4: 15-28 days'), 'eligible_visits']):,} visits",
+    ]
+    # Derived gaps quoted in the text.
+    rates = payer.set_index("payer_name")["no_show_rate_pct"].astype(float)
+    band = r["by_lead_band"].set_index("lead_band")["no_show_rate_pct"].astype(float)
+    required += [
+        f"{rates.loc['Medicaid'] - rates.loc['Medicare FFS']:.1f}-point gap",
+        f"{band.iloc[-1] - band.iloc[0]:.1f}-point climb",
+        f"{float(payer['avg_lead_days'].min()):.1f}–{float(payer['avg_lead_days'].max()):.1f} days",
+        f"{pct(payer['pct_over_14_days'].min())}–{pct(payer['pct_over_14_days'].max())}",
+    ]
+
+    missing = sorted({item for item in required if item not in readme})
+    assert not missing, f"Day 003 README is missing numbers: {missing}"
+
+
+def test_day003_chart_exists(repo_root: Path) -> None:
+    chart = repo_root / "days" / DAY003 / "chart.png"
+    if not chart.exists():
+        pytest.skip("chart.png not built yet; run python run_all.py first")
+    assert chart.stat().st_size > 10_000, "chart.png looks too small to be a real figure"
+
+
+def test_day003_notebook_has_outputs(repo_root: Path) -> None:
+    import nbformat
+
+    path = repo_root / "days" / DAY003 / "analysis.ipynb"
+    if not path.exists():
+        pytest.fail("Day 003 notebook is missing")
+    nb = nbformat.read(path, as_version=4)
+    code_cells = [c for c in nb.cells if c.cell_type == "code"]
+    executed = [c for c in code_cells if c.get("outputs")]
+    if not executed:
+        pytest.skip("notebook has not been executed yet; run python run_all.py first")
+    assert len(executed) >= 3, "Expected executed outputs in the Day 003 notebook"
+    errors = [o for c in code_cells for o in c.get("outputs", []) if o.get("output_type") == "error"]
+    assert not errors, "Day 003 notebook has error outputs"

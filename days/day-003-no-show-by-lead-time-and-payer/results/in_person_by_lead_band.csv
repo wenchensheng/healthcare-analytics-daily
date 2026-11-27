@@ -1,0 +1,6 @@
+lead_band,eligible_visits,no_shows,no_show_rate_pct
+1: 0-3 days,6164,773,12.5
+2: 4-7 days,4528,713,15.7
+3: 8-14 days,8946,1764,19.7
+4: 15-28 days,11690,2891,24.7
+5: 29+ days,1380,477,34.6

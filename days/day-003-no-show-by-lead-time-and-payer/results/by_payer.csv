@@ -1,0 +1,6 @@
+payer_id,payer_name,payer_type,eligible_visits,no_shows,no_show_rate_pct,avg_lead_days,pct_over_14_days
+MCAID,Medicaid,medicaid,7639,1579,20.7,10.5,30.1
+SELF,Self-pay,self_pay,2226,439,19.7,10.3,28.8
+BRCH,Birch HMO,commercial,7382,1371,18.6,10.6,30.8
+SUMP,Summit PPO,commercial,14695,2530,17.2,10.5,29.9
+MEDCR,Medicare FFS,medicare,13148,1979,15.1,10.3,29.3
